@@ -43,6 +43,36 @@ app.delete('/redis/banner', async (req, res) => {
     res.json({ message: 'Banner deleted' });
 });
 
+app.post('/redis/:id', async (req, res) => {
+    const { id } = req.params;
+    await redis.hset(`key:${id}`, req.body);
+    res.json({ message: 'Value updated' });
+});
+
+app.get('/redis/:id', async (req, res) => {
+    const { id } = req.params;
+    const value = await redis.hgetall(`key:${id}`);
+    res.json({ value });
+});
+
+app.get('/redis/:id/:field/exists', async (req, res) => {
+    const { id, field } = req.params;
+    const exists = await redis.hexists(`key:${id}`, field);
+    res.json({ exists: Boolean(exists) });
+}); 
+
+app.delete('/redis/:id/:field', async (req, res) => {
+    const { id, field } = req.params;
+    await redis.hdel(`key:${id}`, field);
+    res.json({ message: 'Value deleted' });
+});
+
+app.get('/redis/:id/:field', async (req, res) => {
+    const { id, field } = req.params;
+    const value = await redis.hget(`key:${id}`, field);
+    res.json({ value });
+});
+
 app.listen(3000, () => {
     console.log('Server is running on port 3000');
 });
